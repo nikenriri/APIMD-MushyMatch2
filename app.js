@@ -73,7 +73,7 @@ app.get('/list-recipes/:id', function (req, res) {
 app.get('/recipes/:id', function (req, res) {
     const recipesId = req.params.id; // Mengambil ID dari parameter URL
     
-    const queryStr = "SELECT * FROM recipes WHERE id_recipe = ?";
+    const queryStr = "SELECT id_recipe, name_recipe, ingredients, steps, pict_recipe, video FROM recipes WHERE id_recipe = ?";
     const values = [recipesId];
     db.query(queryStr, values, (err, results) => {
       if (err) {
