@@ -19,9 +19,14 @@ app.get('/get-jamur', function (req, res){
     db.query(queryStr, (err, results) => {
         if(err){
             console.log(err);
+            res.status(500).send('Terjadi kesalahan saat mengambil data jamur.');
         }else{
-            res.send(results);
-            console.log(results);
+            const jamurObj = {};  // Membuat objek baru
+            results.forEach((jamur, index) => {
+                jamurObj[`jamur${index+1}`] = jamur;  // Menambahkan data jamur ke objek
+            });
+            res.send(jamurObj);
+            console.log(jamurObj);
         }
     })
 })
@@ -33,41 +38,64 @@ app.get('/jamur/:id', function (req, res) {
     const queryStr = "SELECT * FROM mushroom WHERE id = ?";
     const values = [id];
     db.query(queryStr, values, (err, results) => {
-      if (err) {
-        console.log(err);
-        res.status(500).send("Terjadi kesalahan dalam mengambil data.");
-      } else {
-        if (results.length > 0) {
-          res.send(results);
-          console.log(results);
+        if (err) {
+            console.log(err);
+            res.status(500).send("Terjadi kesalahan dalam mengambil data.");
         } else {
-          res.status(404).send("Data tidak ditemukan.");
+            if (results.length > 0) {
+                const jamur = results[0];  // Mengambil jamur pertama dari hasil query
+                const jamurObj = {
+                    id: jamur.id,
+                    nama: jamur.name,
+                    latin_name: jamur.latin_name,
+                    description: jamur.description,
+                    habitat: jamur.habitat,
+                    picture: jamur.pict
+                    // Tambahkan properti lain sesuai kebutuhan
+                };
+                res.send(jamurObj);
+                console.log(jamurObj);
+            } else {
+                res.status(404).send("Data tidak ditemukan.");
+            }
         }
-      }
     });
-  });
+});
+
 
 //menampilkan list resep berdasarkan id jamur
 app.get('/list-recipes/:id', function (req, res) {
     const jamurId = req.params.id;
-  
+
     const queryStr = `
       SELECT recipes.id_recipe, recipes.name_recipe, recipes.pict_recipe
       FROM recipes
       INNER JOIN mushroom ON recipes.id_jamur = mushroom.id
       WHERE mushroom.id = ?
     `;
-  
+
     db.query(queryStr, [jamurId], (err, results) => {
-      if (err) {
-        console.log(err);
-        res.status(500).send("Terjadi kesalahan dalam mengambil data.");
-      } else {
-        res.send(results);
-        console.log(results);
+        if (err) {
+            console.log(err);
+            res.status(500).send("Terjadi kesalahan dalam mengambil data.");
+        } else {
+            if (results.length > 0) {
+                const recipes = results[0];  // Mengambil jamur pertama dari hasil query
+                const recipeObj = {
+                    id_recipe: recipes.id_recipe,
+                    name_recipe: recipes.name_recipe,
+                    pict_recipe: recipes.pict_recipe
+                    // Tambahkan properti lain sesuai kebutuhan
+                };
+                res.send(recipeObj);
+                console.log(recipeObj);
+            } else {
+                res.status(404).send("Data tidak ditemukan.");
+            } 
       }
     });
-  });
+});
+
 
 //menampilkan detil resep berdasarkan id resep 
 app.get('/recipes/:id', function (req, res) {
@@ -76,19 +104,29 @@ app.get('/recipes/:id', function (req, res) {
     const queryStr = "SELECT id_recipe, name_recipe, ingredients, steps, pict_recipe, video FROM recipes WHERE id_recipe = ?";
     const values = [recipesId];
     db.query(queryStr, values, (err, results) => {
-      if (err) {
-        console.log(err);
-        res.status(500).send("Terjadi kesalahan dalam mengambil data.");
-      } else {
-        if (results.length > 0) {
-          res.send(results);
-          console.log(results);
+        if (err) {
+            console.log(err);
+            res.status(500).send("Terjadi kesalahan dalam mengambil data.");
         } else {
-          res.status(404).send("Data tidak ditemukan.");
+            if (results.length > 0) {
+                const recipe = results[0];  // Mengambil resep pertama dari hasil query
+                const recipeObj = {
+                    id_recipe: recipe.id_recipe,
+                    name_recipe: recipe.name_recipe,
+                    ingredients: recipe.ingredients,
+                    steps: recipe.steps,
+                    pict_recipe: recipe.pict_recipe,
+                    video: recipe.video
+                };
+                res.send(recipeObj);
+                console.log(recipeObj);
+            } else {
+                res.status(404).send("Data tidak ditemukan.");
+            }
         }
-      }
     });
 });
+
 
 
 
