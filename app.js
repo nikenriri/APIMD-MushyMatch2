@@ -65,35 +65,33 @@ app.get('/jamur/:id', function (req, res) {
 
 //menampilkan list resep berdasarkan id jamur
 app.get('/list-recipes/:id', function (req, res) {
-    const jamurId = req.params.id;
+  const jamurId = req.params.id;
 
-    const queryStr = `
-      SELECT recipes.id_recipe, recipes.name_recipe, recipes.pict_recipe
-      FROM recipes
-      INNER JOIN mushroom ON recipes.id_jamur = mushroom.id
-      WHERE mushroom.id = ?
-    `;
+  const queryStr = `
+    SELECT recipes.id_recipe, recipes.name_recipe, recipes.pict_recipe
+    FROM recipes
+    INNER JOIN mushroom ON recipes.id_jamur = mushroom.id
+    WHERE mushroom.id = ?
+  `;
 
-    db.query(queryStr, [jamurId], (err, results) => {
-        if (err) {
-            console.log(err);
-            res.status(500).send("Terjadi kesalahan dalam mengambil data.");
-        } else {
-            if (results.length > 0) {
-                const recipes = results[0];  // Mengambil jamur pertama dari hasil query
-                const recipeObj = {
-                    id_recipe: recipes.id_recipe,
-                    name_recipe: recipes.name_recipe,
-                    pict_recipe: recipes.pict_recipe
-                    // Tambahkan properti lain sesuai kebutuhan
-                };
-                res.send(recipeObj);
-                console.log(recipeObj);
-            } else {
-                res.status(404).send("Data tidak ditemukan.");
-            } 
+  db.query(queryStr, [jamurId], (err, results) => {
+      if (err) {
+          console.log(err);
+          res.status(500).send("Terjadi kesalahan dalam mengambil data.");
+      } else {
+        if(results.length > 0){
+          const recipesObj = results.map(recipe => {
+              return {
+                  id_recipe: recipe.id_recipe,
+                  name_recipe: recipe.name_recipe,
+                  pict_recipe: recipe.pict_recipe
+              };
+          });
+          res.send(recipesObj);
+          console.log(recipesObj);
+        }
       }
-    });
+  });
 });
 
 
