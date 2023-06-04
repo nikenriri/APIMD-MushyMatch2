@@ -128,7 +128,28 @@ app.get('/recipes/:id', function (req, res) {
 });
 
 
+//melakukan pencarian pada data jamur
+app.get('/search', function (req, res) {
+    const searchTerm = req.query.q; // Mengambil parameter pencarian dari query string (contoh: /search?q=keyword)
+    const queryStr = `
+        SELECT * FROM mushroom
+        WHERE name LIKE '%${searchTerm}%'
+    `;
 
+    db.query(queryStr, (err, results) => {
+        if (err) {
+            console.log(err);
+            res.status(500).send('Terjadi kesalahan dalam melakukan pencarian.');
+        } else {
+            const jamurObj = {};  // Membuat objek baru
+            results.forEach((jamur) => {
+              jamurObj[jamur.id] = jamur;  // Menambahkan data jamur ke objek dengan ID sebagai kunci
+          });
+          res.send(jamurObj);
+          console.log(jamurObj);
+        }
+    });
+});
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
