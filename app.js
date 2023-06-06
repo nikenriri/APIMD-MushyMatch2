@@ -15,21 +15,17 @@ app.get("/", (req, res) => {
 
 //menampilkan semua data jamur
 app.get('/get-jamur', function (req, res){
-  const queryStr = 'SELECT * FROM mushroom';
-  db.query(queryStr, (err, results) => {
-      if(err){
-          console.log(err);
-          res.status(500).send('Terjadi kesalahan saat mengambil data jamur.');
-      }else{
-          const jamurObj = {};  // Membuat objek baru
-          results.forEach((jamur) => {
-              jamurObj[jamur.id] = jamur;  // Menambahkan data jamur ke objek dengan ID sebagai kunci
-          });
-          res.send(jamurObj);
-          console.log(jamurObj);
-      }
-  })
-});
+    const queryStr = 'SELECT * FROM mushroom';
+    db.query(queryStr, (err, results) => {
+        if(err){
+            console.log(err);
+            res.status(500).send("Terjadi kesalahan dalam mengambil data.");
+        }else{
+            res.send(results);
+            console.log(results);
+        }
+    })
+})
 
 
 //menampilkan data jamur berdasarkan id
@@ -69,7 +65,7 @@ app.get('/list-recipes/:id', function (req, res) {
   const jamurId = req.params.id;
 
   const queryStr = `
-    SELECT recipes.id_recipe, recipes.name_recipe, recipes.pict_recipe
+    SELECT recipes.id_recipe, recipes.name_recipe, recipes.pict_recipe, mushroom.name
     FROM recipes
     INNER JOIN mushroom ON recipes.id_jamur = mushroom.id
     WHERE mushroom.id = ?
@@ -85,7 +81,8 @@ app.get('/list-recipes/:id', function (req, res) {
               return {
                   id_recipe: recipe.id_recipe,
                   name_recipe: recipe.name_recipe,
-                  pict_recipe: recipe.pict_recipe
+                  pict_recipe: recipe.pict_recipe,
+                  name_jamur: recipe.name
               };
           });
           res.send(recipesObj);
@@ -94,7 +91,6 @@ app.get('/list-recipes/:id', function (req, res) {
       }
   });
 });
-
 
 
 //menampilkan detil resep berdasarkan id resep 
